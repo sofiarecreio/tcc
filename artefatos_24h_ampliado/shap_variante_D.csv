@@ -1,0 +1,45 @@
+﻿variavel,shap_medio_abs,nova
+gcs_min_24h,0.3213851,True
+ventilacao_invasiva_24h,0.25147045,True
+frequencia_cardiaca_24h,0.12580818,False
+peep_max_24h,0.12191478,True
+ptt_24h,0.107835114,False
+bilirrubina_max_24h,0.102538474,True
+ureia_24h,0.09530386,False
+pam_24h,0.082934804,False
+temperatura_24h,0.07857866,True
+glicose_24h,0.07603548,False
+sodio_24h,0.06388277,False
+feve_ausente,0.058127634,False
+idade,0.055181853,False
+potassio_24h,0.05427335,False
+hemoglobina_min_24h,0.052995145,True
+tipo_admissao_EW EMER.,0.052546773,False
+fio2_max_24h,0.050932325,True
+troponina_t_max_24h,0.04981236,True
+frequencia_respiratoria_24h,0.04732817,False
+feve,0.04528752,False
+spo2_24h,0.04426279,False
+creatinina_24h,0.04316197,False
+ph_min_24h,0.043097246,True
+bicarbonato_min_24h,0.041625373,True
+lactato_max_24h,0.04128101,True
+leucocitos_max_24h,0.03718477,True
+gasometria_medida,0.033421315,True
+plaquetas_min_24h,0.03301006,True
+tipo_admissao_URGENT,0.031135669,False
+pco2_max_24h,0.026802836,True
+troponina_medida,0.020090565,True
+inr_max_24h,0.018091492,True
+lactato_medido,0.012485985,True
+tipo_admissao_SURGICAL SAME DAY ADMISSION,0.010818805,False
+tipo_admissao_ELECTIVE,0.008230371,False
+nt_probnp_max_24h,0.008113243,True
+genero_F,0.0043410654,False
+tipo_admissao_OBSERVATION ADMIT,0.0037025162,False
+nt_probnp_medido,0.0009372819,True
+tipo_admissao_DIRECT EMER.,0.0005265047,False
+genero_M,0.0003719617,False
+tipo_admissao_AMBULATORY OBSERVATION,0.0,False
+tipo_admissao_EU OBSERVATION,0.0,False
+tipo_admissao_DIRECT OBSERVATION,0.0,False

@@ -1,0 +1,88 @@
+{
+  "alvo": "los_dias",
+  "treino_em": "log1p(los_dias)",
+  "metricas_em": "dias, depois de expm1",
+  "n_treino": 20713,
+  "n_teste": 5319,
+  "melhor_modelo_teste_por_MAE": "XGBoost",
+  "metricas_teste": [
+    {
+      "modelo": "XGBoost",
+      "conjunto": "teste",
+      "MAE": 2.6670781141730613,
+      "RMSE": 5.661656863526716,
+      "R2": 0.024586340079805535
+    },
+    {
+      "modelo": "Random Forest",
+      "conjunto": "teste",
+      "MAE": 2.675554002640216,
+      "RMSE": 5.7279711900783745,
+      "R2": 0.0016027086010712566
+    },
+    {
+      "modelo": "Ridge",
+      "conjunto": "teste",
+      "MAE": 2.7157449087134324,
+      "RMSE": 5.762127774247658,
+      "R2": -0.01033992053659416
+    },
+    {
+      "modelo": "Lasso",
+      "conjunto": "teste",
+      "MAE": 2.7170322533132025,
+      "RMSE": 5.7651410872229505,
+      "R2": -0.011396914260577429
+    },
+    {
+      "modelo": "Mediana do treino",
+      "conjunto": "teste",
+      "MAE": 2.7624724324225522,
+      "RMSE": 5.986036381599429,
+      "R2": -0.0903864559128078
+    }
+  ],
+  "shap_top10": [
+    {
+      "variavel": "spo2_24h",
+      "shap_medio_abs": 0.06753282248973846
+    },
+    {
+      "variavel": "idade",
+      "shap_medio_abs": 0.060487300157547
+    },
+    {
+      "variavel": "ptt_24h",
+      "shap_medio_abs": 0.05824225768446922
+    },
+    {
+      "variavel": "pam_24h",
+      "shap_medio_abs": 0.05408141762018204
+    },
+    {
+      "variavel": "glicose_24h",
+      "shap_medio_abs": 0.05021537095308304
+    },
+    {
+      "variavel": "frequencia_respiratoria_24h",
+      "shap_medio_abs": 0.042840227484703064
+    },
+    {
+      "variavel": "frequencia_cardiaca_24h",
+      "shap_medio_abs": 0.04200096055865288
+    },
+    {
+      "variavel": "ureia_24h",
+      "shap_medio_abs": 0.03274631127715111
+    },
+    {
+      "variavel": "sodio_24h",
+      "shap_medio_abs": 0.02884626016020775
+    },
+    {
+      "variavel": "creatinina_24h",
+      "shap_medio_abs": 0.02777298353612423
+    }
+  ],
+  "nota": "Os modelos aprendem log(1 + los_dias) por causa da cauda longa. MAE, RMSE e R2 sao calculados em dias. Ridge e Lasso usam a matriz escalonada. Random Forest e XGBoost usam a matriz sem escala. O teste nao entrou na escolha de alpha nem no treino."
+}

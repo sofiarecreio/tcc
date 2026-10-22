@@ -1,0 +1,153 @@
+{
+  "pergunta": "Quanto o quadro clinico ao longo da estadia de UTI, e nao apenas as primeiras 24 horas, acompanha o tempo total de permanencia?",
+  "n_estadias": 26032,
+  "n_ate_14_dias": 24857,
+  "alvo": "los_dias",
+  "treino": "log(1+los_dias), metricas de volta em dias",
+  "fora_do_modelo": [
+    "los_dias",
+    "contagem de registros",
+    "outtime",
+    "CID"
+  ],
+  "metricas": [
+    {
+      "coorte": "estadia_completa",
+      "modelo": "Mediana do treino",
+      "MAE": 2.7624724324225522,
+      "RMSE": 5.986036381599429,
+      "R2": -0.0903864559128078
+    },
+    {
+      "coorte": "estadia_completa",
+      "modelo": "Ridge",
+      "MAE": 1.9777046248512071,
+      "RMSE": 4.5977178148719835,
+      "R2": 0.3567402611794228
+    },
+    {
+      "coorte": "estadia_completa",
+      "modelo": "Lasso",
+      "MAE": 1.9829038643434835,
+      "RMSE": 4.604691622682228,
+      "R2": 0.35478739146201066
+    },
+    {
+      "coorte": "estadia_completa",
+      "modelo": "Random Forest",
+      "MAE": 1.8296501998653931,
+      "RMSE": 4.375743931263681,
+      "R2": 0.4173529626156699
+    },
+    {
+      "coorte": "estadia_completa",
+      "modelo": "XGBoost",
+      "MAE": 1.565887309756704,
+      "RMSE": 3.654653500742334,
+      "R2": 0.5935621368000732
+    },
+    {
+      "coorte": "ate_14_dias",
+      "modelo": "Mediana do treino",
+      "MAE": 1.945190997520451,
+      "RMSE": 2.9682119082591303,
+      "R2": -0.13168438948008032
+    },
+    {
+      "coorte": "ate_14_dias",
+      "modelo": "Ridge",
+      "MAE": 1.4438514466301209,
+      "RMSE": 2.576098933255512,
+      "R2": 0.14756633167290045
+    },
+    {
+      "coorte": "ate_14_dias",
+      "modelo": "Lasso",
+      "MAE": 1.444233539710165,
+      "RMSE": 2.5641084277454573,
+      "R2": 0.15548320418160888
+    },
+    {
+      "coorte": "ate_14_dias",
+      "modelo": "Random Forest",
+      "MAE": 1.297654365653227,
+      "RMSE": 2.0463026067638275,
+      "R2": 0.46213258587247774
+    },
+    {
+      "coorte": "ate_14_dias",
+      "modelo": "XGBoost",
+      "MAE": 1.0873838536578242,
+      "RMSE": 1.7182919310761644,
+      "R2": 0.6207466545786103
+    }
+  ],
+  "shap_estadia_completa": [
+    {
+      "variavel": "ureia_max",
+      "shap_medio_abs": 0.21710065007209778
+    },
+    {
+      "variavel": "ureia_min",
+      "shap_medio_abs": 0.15884988009929657
+    },
+    {
+      "variavel": "spo2_min",
+      "shap_medio_abs": 0.13220933079719543
+    },
+    {
+      "variavel": "creatinina_min",
+      "shap_medio_abs": 0.11368650197982788
+    },
+    {
+      "variavel": "creatinina_max",
+      "shap_medio_abs": 0.08486277610063553
+    },
+    {
+      "variavel": "pam_max",
+      "shap_medio_abs": 0.07200378179550171
+    },
+    {
+      "variavel": "pam_min",
+      "shap_medio_abs": 0.06294429302215576
+    },
+    {
+      "variavel": "spo2_max",
+      "shap_medio_abs": 0.054846491664648056
+    }
+  ],
+  "shap_ate_14_dias": [
+    {
+      "variavel": "ureia_max",
+      "shap_medio_abs": 0.18689320981502533
+    },
+    {
+      "variavel": "ureia_min",
+      "shap_medio_abs": 0.1385519951581955
+    },
+    {
+      "variavel": "spo2_min",
+      "shap_medio_abs": 0.10874681919813156
+    },
+    {
+      "variavel": "creatinina_min",
+      "shap_medio_abs": 0.09798430651426315
+    },
+    {
+      "variavel": "creatinina_max",
+      "shap_medio_abs": 0.0801139697432518
+    },
+    {
+      "variavel": "pam_min",
+      "shap_medio_abs": 0.06057867780327797
+    },
+    {
+      "variavel": "pam_max",
+      "shap_medio_abs": 0.05929921939969063
+    },
+    {
+      "variavel": "spo2_max",
+      "shap_medio_abs": 0.05304247885942459
+    }
+  ]
+}

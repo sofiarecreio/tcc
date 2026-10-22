@@ -1,0 +1,25 @@
+﻿variavel,shap_medio_abs
+spo2_24h,0.19402161
+idade,0.14747429
+glicose_24h,0.14382014
+frequencia_cardiaca_24h,0.13663426
+pam_24h,0.1294485
+ptt_24h,0.12867102
+frequencia_respiratoria_24h,0.092994906
+sodio_24h,0.07491325
+ureia_24h,0.070858136
+creatinina_24h,0.06517156
+feve_ausente,0.06495087
+tipo_admissao_URGENT,0.063387826
+tipo_admissao_EW EMER.,0.045227498
+feve,0.038917806
+potassio_24h,0.0220465
+genero_F,0.012922961
+tipo_admissao_OBSERVATION ADMIT,0.005241687
+tipo_admissao_ELECTIVE,0.0019772777
+tipo_admissao_EU OBSERVATION,0.0019232004
+tipo_admissao_SURGICAL SAME DAY ADMISSION,0.0017237443
+genero_M,0.0013408391
+tipo_admissao_DIRECT EMER.,0.0009152375
+tipo_admissao_AMBULATORY OBSERVATION,0.0
+tipo_admissao_DIRECT OBSERVATION,0.0

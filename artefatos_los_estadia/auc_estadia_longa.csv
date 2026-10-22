@@ -1,0 +1,17 @@
+﻿cenario,corte_dias,modelo,pct_longas,AUC,acuracia_balanceada
+primeiras 24 h,3.55,Ridge,32.9,0.643,0.553
+primeiras 24 h,3.55,Lasso,32.9,0.642,0.551
+primeiras 24 h,3.55,Random Forest,32.9,0.68,0.575
+primeiras 24 h,3.55,XGBoost,32.9,0.682,0.601
+primeiras 24 h,7.0,Ridge,14.1,0.635,0.5
+primeiras 24 h,7.0,Lasso,14.1,0.635,0.5
+primeiras 24 h,7.0,Random Forest,14.1,0.68,0.5
+primeiras 24 h,7.0,XGBoost,14.1,0.686,0.505
+estadia inteira,3.55,Ridge,32.9,0.89,0.768
+estadia inteira,3.55,Lasso,32.9,0.891,0.767
+estadia inteira,3.55,Random Forest,32.9,0.914,0.797
+estadia inteira,3.55,XGBoost,32.9,0.927,0.835
+estadia inteira,7.0,Ridge,14.1,0.924,0.703
+estadia inteira,7.0,Lasso,14.1,0.924,0.697
+estadia inteira,7.0,Random Forest,14.1,0.941,0.682
+estadia inteira,7.0,XGBoost,14.1,0.949,0.793

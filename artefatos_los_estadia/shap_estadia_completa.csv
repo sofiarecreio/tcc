@@ -1,0 +1,46 @@
+﻿variavel,shap_medio_abs
+ureia_max,0.21955341
+ureia_min,0.15989767
+spo2_min,0.13123393
+creatinina_min,0.1175928
+creatinina_max,0.08788447
+pam_max,0.07380552
+pam_min,0.06337983
+potassio,0.054079264
+spo2_max,0.053191915
+ptt,0.034658983
+idade,0.02301609
+glicose,0.022642428
+spo2,0.018505394
+creatinina,0.016509635
+genero_F,0.013031021
+unidade_Neuro Intermediate,0.012088975
+unidade_Cardiac Vascular Intensive Care Unit (CVICU),0.011283058
+pam,0.009882435
+frequencia_respiratoria,0.009692431
+sodio,0.009667812
+frequencia_cardiaca,0.008263124
+unidade_Medical Intensive Care Unit (MICU),0.007987107
+ureia,0.0062186862
+unidade_Medical/Surgical Intensive Care Unit (MICU/SICU),0.0056924815
+tipo_admissao_URGENT,0.0038206473
+tipo_admissao_OBSERVATION ADMIT,0.0031759397
+feve,0.0030549832
+genero_M,0.0029260903
+unidade_Neuro Stepdown,0.0024300828
+unidade_Surgical Intensive Care Unit (SICU),0.0010583808
+unidade_Coronary Care Unit (CCU),0.0010247035
+tipo_admissao_EW EMER.,0.00077824347
+tipo_admissao_ELECTIVE,0.0007401539
+tipo_admissao_DIRECT EMER.,0.00073895865
+unidade_Neuro Surgical Intensive Care Unit (Neuro SICU),0.000481373
+unidade_Surgery/Vascular/Intermediate,8.797061e-05
+tipo_admissao_DIRECT OBSERVATION,7.646084e-05
+unidade_Trauma SICU (TSICU),5.1839885e-05
+tipo_admissao_EU OBSERVATION,4.9225877e-05
+tipo_admissao_AMBULATORY OBSERVATION,0.0
+tipo_admissao_SURGICAL SAME DAY ADMISSION,0.0
+unidade_Medicine,0.0
+unidade_Intensive Care Unit (ICU),0.0
+unidade_PACU,0.0
+unidade_Surgery/Trauma,0.0

@@ -1,0 +1,153 @@
+{
+  "alvo": "feve_porcentagem",
+  "n_estadias": 9065,
+  "n_treino": 7252,
+  "n_teste": 1813,
+  "n_medidas_eco": 27,
+  "medidas_eco": [
+    "ascending_diam",
+    "av_pk_vel",
+    "body_surface_area",
+    "height_cm",
+    "inf_lat_thickness",
+    "la_4ch_length",
+    "la_dimen",
+    "lat_e_prime",
+    "lvedd",
+    "lvesd",
+    "lvot_diam",
+    "lvot_vti",
+    "mv_e_decel",
+    "mv_peak_a",
+    "mv_peak_e",
+    "mv_peak_e_a",
+    "ra_length",
+    "resting_dbp",
+    "resting_hr",
+    "resting_sbp",
+    "rv_diam",
+    "sept_e_prime",
+    "septal_thickness",
+    "sinus_diam",
+    "tr_mmhg",
+    "tr_velocity",
+    "weight_kg"
+  ],
+  "painel_24h": [
+    "idade",
+    "pam_24h",
+    "frequencia_cardiaca_24h",
+    "frequencia_respiratoria_24h",
+    "spo2_24h",
+    "creatinina_24h",
+    "ureia_24h",
+    "sodio_24h",
+    "potassio_24h",
+    "glicose_24h",
+    "ptt_24h",
+    "ascending_diam",
+    "av_pk_vel",
+    "body_surface_area",
+    "height_cm",
+    "inf_lat_thickness",
+    "la_4ch_length",
+    "la_dimen",
+    "lat_e_prime",
+    "lvedd",
+    "lvesd",
+    "lvot_diam",
+    "lvot_vti",
+    "mv_e_decel",
+    "mv_peak_a",
+    "mv_peak_e",
+    "mv_peak_e_a",
+    "ra_length",
+    "resting_dbp",
+    "resting_hr",
+    "resting_sbp",
+    "rv_diam",
+    "sept_e_prime",
+    "septal_thickness",
+    "sinus_diam",
+    "tr_mmhg",
+    "tr_velocity",
+    "weight_kg"
+  ],
+  "alpha_ridge": 316.22776601683796,
+  "alpha_lasso": 0.03162277660168379,
+  "metricas_teste": [
+    {
+      "modelo": "XGBoost",
+      "MAE": 8.91411341347881,
+      "RMSE": 11.361619707421452,
+      "R2": 0.5828727454601921
+    },
+    {
+      "modelo": "Random Forest",
+      "MAE": 9.804069635811349,
+      "RMSE": 12.230456202227172,
+      "R2": 0.51663702241705
+    },
+    {
+      "modelo": "Lasso",
+      "MAE": 10.354476919583382,
+      "RMSE": 12.821778733889563,
+      "R2": 0.46876751339030254
+    },
+    {
+      "modelo": "Ridge",
+      "MAE": 10.371522481302447,
+      "RMSE": 12.832830410929223,
+      "R2": 0.4678513315963806
+    },
+    {
+      "modelo": "Mediana do treino",
+      "MAE": 15.219525648097077,
+      "RMSE": 17.60598667172767,
+      "R2": -0.0016334216074400665
+    }
+  ],
+  "shap_top10": [
+    {
+      "variavel": "lvesd",
+      "shap_medio_abs": 5.820599555969238
+    },
+    {
+      "variavel": "lvedd",
+      "shap_medio_abs": 2.712259531021118
+    },
+    {
+      "variavel": "lvot_vti",
+      "shap_medio_abs": 1.826750636100769
+    },
+    {
+      "variavel": "resting_sbp",
+      "shap_medio_abs": 1.136557698249817
+    },
+    {
+      "variavel": "av_pk_vel",
+      "shap_medio_abs": 1.1289284229278564
+    },
+    {
+      "variavel": "resting_dbp",
+      "shap_medio_abs": 1.1113966703414917
+    },
+    {
+      "variavel": "mv_e_decel",
+      "shap_medio_abs": 1.0213695764541626
+    },
+    {
+      "variavel": "body_surface_area",
+      "shap_medio_abs": 0.8135799765586853
+    },
+    {
+      "variavel": "sept_e_prime",
+      "shap_medio_abs": 0.6808443069458008
+    },
+    {
+      "variavel": "ptt_24h",
+      "shap_medio_abs": 0.6638412475585938
+    }
+  ],
+  "nota": "A FEVE do exame não entra como variável. O eco é o que já estava ligado à estadia de UTI. Treino e teste não compartilham paciente."
+}

@@ -1,0 +1,7 @@
+﻿corte_dias,modelo,AUC_regressao,AUC_classificador,ganho
+3.55,XGBoost,0.682,0.681,-0.001
+3.55,Random Forest,0.68,0.674,-0.005
+3.55,Regressão logística,0.643,0.64,-0.003
+7.0,XGBoost,0.686,0.683,-0.002
+7.0,Random Forest,0.68,0.675,-0.005
+7.0,Regressão logística,0.635,0.638,0.003

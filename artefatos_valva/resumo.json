@@ -1,0 +1,20 @@
+{
+  "n_exames_com_os_dois_valores": 38166,
+  "n_plausiveis": 38092,
+  "n_treino": 30466,
+  "n_teste": 7626,
+  "pacientes_teste": 3820,
+  "fisica_no_teste": {
+    "R2": 0.9573910557972344,
+    "MAE_mmHg": 0.728208792952531
+  },
+  "reta_no_teste": {
+    "R2": 0.9103904748653812,
+    "MAE_mmHg": 3.933947602780843
+  },
+  "reta_coeficiente": 22.801410801940527,
+  "reta_intercepto": -28.400921297383867,
+  "n_fogem_da_formula": 140,
+  "corte_diferenca_mmhg": 10.0,
+  "corte_diferenca_relativa": 0.2
+}

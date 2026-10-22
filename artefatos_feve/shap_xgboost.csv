@@ -1,0 +1,50 @@
+﻿variavel,shap_medio_abs
+lvesd,5.8205996
+lvedd,2.7122595
+lvot_vti,1.8267506
+resting_sbp,1.1365577
+av_pk_vel,1.1289284
+resting_dbp,1.1113967
+mv_e_decel,1.0213696
+body_surface_area,0.81358
+sept_e_prime,0.6808443
+ptt_24h,0.66384125
+spo2_24h,0.6194129
+glicose_24h,0.5969174
+genero_F,0.5720358
+weight_kg,0.55741423
+lat_e_prime,0.53787774
+height_cm,0.3990141
+tr_mmhg,0.3663416
+creatinina_24h,0.3651899
+ra_length,0.3597499
+septal_thickness,0.32815737
+sinus_diam,0.32632327
+sodio_24h,0.29375648
+pam_24h,0.2721558
+resting_hr,0.27088335
+tr_velocity,0.252123
+tipo_admissao_URGENT,0.2458562
+idade,0.21437478
+mv_peak_a,0.21350771
+frequencia_cardiaca_24h,0.20928937
+mv_peak_e,0.19497791
+la_dimen,0.19040696
+potassio_24h,0.17487259
+ascending_diam,0.14102192
+mv_peak_e_a,0.13250467
+la_4ch_length,0.11519943
+ureia_24h,0.11271063
+rv_diam,0.09598644
+tipo_admissao_OBSERVATION ADMIT,0.095556155
+genero_M,0.0878708
+frequencia_respiratoria_24h,0.08244536
+inf_lat_thickness,0.07988951
+lvot_diam,0.0744115
+tipo_admissao_EW EMER.,0.04194958
+tipo_admissao_SURGICAL SAME DAY ADMISSION,0.0346033
+tipo_admissao_ELECTIVE,0.00973467
+tipo_admissao_DIRECT EMER.,0.0015778225
+tipo_admissao_AMBULATORY OBSERVATION,0.0
+tipo_admissao_EU OBSERVATION,0.0
+tipo_admissao_DIRECT OBSERVATION,0.0

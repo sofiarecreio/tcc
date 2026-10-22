@@ -1,0 +1,19 @@
+# Dados do MIMIC (acesso credenciado no PhysioNet, nao podem ser publicados)
+data/
+
+# Tabelas com uma linha por paciente ou estadia
+artefatos*/X_*.csv
+artefatos*/y_*.csv
+artefatos*/ids_*.csv
+artefatos*/coorte_bruta.csv
+artefatos*/tabela_*.csv
+artefatos*/previsoes_*.csv
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Tabelas por exame (tema da valva aortica, descartado)
+artefatos_valva/pares_*.csv
+artefatos_valva/exames_*.csv
