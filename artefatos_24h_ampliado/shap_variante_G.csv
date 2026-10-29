@@ -1,0 +1,66 @@
+﻿variavel,shap_medio_abs,novo_io
+ventilacao_invasiva_24h,0.17864217,False
+ingestao_oral_ml,0.17005457,True
+gcs_min_24h,0.1098551,False
+noradrenalina_taxa_max_24h,0.10828171,True
+fio2_max_24h,0.1058997,False
+furosemida_dose_total_24h,0.10302344,True
+peep_max_24h,0.095517136,False
+volume_infundido_24h,0.09450916,True
+temperatura_24h,0.07322947,False
+frequencia_cardiaca_24h,0.07303672,False
+idade,0.0715215,False
+ptt_24h,0.067153834,False
+ureia_24h,0.0670047,False
+saida_total_24h,0.062356085,True
+glicose_24h,0.060732886,False
+inotropico_24h,0.060233627,True
+hemoglobina_min_24h,0.058866333,False
+frequencia_respiratoria_24h,0.051983114,False
+potassio_24h,0.051455278,False
+balanco_ml_kg_24h,0.048610907,True
+tipo_admissao_EW EMER.,0.04785767,False
+sodio_24h,0.04783456,False
+bilirrubina_max_24h,0.04359238,False
+diurese_total_24h,0.03749484,True
+ph_min_24h,0.036595438,False
+feve_ausente,0.03282623,False
+creatinina_24h,0.032314032,False
+spo2_24h,0.030913386,False
+plaquetas_min_24h,0.029858582,False
+pam_24h,0.028460465,False
+peso_kg,0.027519751,True
+pco2_max_24h,0.025704183,False
+lactato_max_24h,0.024824686,False
+tipo_admissao_URGENT,0.024538754,False
+inr_max_24h,0.02401527,False
+lactato_medido,0.021065462,False
+troponina_t_max_24h,0.02020035,False
+balanco_hidrico_24h,0.01845195,True
+feve,0.017220447,False
+bicarbonato_min_24h,0.016654428,False
+noradrenalina_24h,0.016642917,True
+diurese_ml_kg_h_24h,0.014899545,True
+leucocitos_max_24h,0.014393916,False
+diuretico_alca_24h,0.012888432,True
+gasometria_medida,0.012653991,False
+nt_probnp_medido,0.008555833,False
+tipo_admissao_SURGICAL SAME DAY ADMISSION,0.008092823,False
+vasopressina_24h,0.007968141,True
+dopamina_24h,0.006619406,True
+tipo_admissao_OBSERVATION ADMIT,0.0061668637,False
+fenilefrina_24h,0.006120739,True
+tipo_admissao_ELECTIVE,0.0051357914,False
+furosemida_infusao_continua_24h,0.0047503426,True
+n_vasopressores_24h,0.0035448985,True
+troponina_medida,0.0032371448,False
+genero_F,0.0021195668,False
+nt_probnp_max_24h,0.0011113327,False
+tipo_admissao_DIRECT EMER.,0.0009031055,False
+diurese_medida,0.00071225537,True
+vasopressor_24h,0.0006765003,True
+genero_M,8.772845e-05,False
+adrenalina_24h,7.698259e-05,True
+oliguria_24h,0.0,True
+tipo_admissao_EU OBSERVATION,0.0,False
+tipo_admissao_DIRECT OBSERVATION,0.0,False

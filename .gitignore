@@ -17,3 +17,4 @@ __pycache__/
 # Tabelas por exame (tema da valva aortica, descartado)
 artefatos_valva/pares_*.csv
 artefatos_valva/exames_*.csv
+tcc_latex
