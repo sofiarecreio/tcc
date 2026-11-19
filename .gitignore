@@ -18,3 +18,8 @@ __pycache__/
 artefatos_valva/pares_*.csv
 artefatos_valva/exames_*.csv
 tcc_latex
+
+# Ambiente local, PDFs temporários e saídas do protocolo com dados individuais
+tmp/
+.venv/
+artefatos_protocolo_24h/
