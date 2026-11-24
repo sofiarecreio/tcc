@@ -23,7 +23,8 @@ import pandas as pd
 from sklearn.model_selection import StratifiedGroupKFold, cross_val_predict
 from sklearn.metrics import roc_auc_score, roc_curve
 from threadpoolctl import threadpool_limits
-from experimentos_24h import (ROOT, TODAS, harmonizar, dividir_preservando, pipeline,
+# Experimento exploratório feito sobre o protocolo v3 (sem contexto): fica fixado nele.
+from experimentos_24h import (V3 as ROOT, TODAS_V3 as TODAS, harmonizar, dividir_preservando, pipeline,
                               avaliar, otimizar, diferenca_pareada)
 
 OUT = ROOT / 'populacao'
@@ -98,7 +99,7 @@ def rodar(bootstrap=500, rebusca=False, ic_max_seq=1):
         m = ic_ate_posicao(m, ic_max_seq)
         OUT = ROOT / f'populacao_ic_seq1a{ic_max_seq}'
     e = pd.read_csv('data/processados/eicu_ampliado_24h.csv', low_memory=False)
-    perfis = {'completo_ampliado': TODAS, 'harmonizado': harmonizar(m, e)}
+    perfis = {'completo_ampliado': TODAS, 'harmonizado': harmonizar(m, e, TODAS, ROOT)}
     tr_all, te_all = dividir_preservando(m)
     OUT.mkdir(parents=True, exist_ok=True)
     rows, ns = [], []

@@ -13,14 +13,15 @@ def janela(d, horas=24, anteriores=False):
     return d[d.offset.lt(horas*60)&d.disponivel.lt(horas*60)&
              (d.offset.ge(-10080) if anteriores else d.offset.ge(0))].copy()
 
-def aki_creatinina(eventos, ids):
+def aki_creatinina(eventos, ids, horas=24):
     """Maior estágio pelo critério de creatinina KDIGO; não inclui RRT/diurese.
 
     Basal = menor medida PRÉVIA nos últimos sete dias; subida absoluta em 48h.
     Sem medida anterior comparável, o estágio é desconhecido (não zero).
+    `horas` > 24 só para análises retrospectivas identificadas.
     """
-    out=pd.Series(np.nan,index=pd.Index(ids,name='stay_id'),name='aki_creatinina_estagio_24h')
-    d=janela(eventos,anteriores=True)
+    out=pd.Series(np.nan,index=pd.Index(ids,name='stay_id'),name=f'aki_creatinina_estagio_{horas}h')
+    d=janela(eventos,horas,anteriores=True)
     d=d[d.valor.between(.1,30)].groupby(['stay_id','offset'],as_index=False).valor.mean()
     for stay,g in d.groupby('stay_id'):
         g=g.sort_values('offset'); t=g.offset.to_numpy(); x=g.valor.to_numpy(); scores=[]
@@ -35,6 +36,45 @@ def aki_creatinina(eventos, ids):
             scores.append(stage)
         if scores: out.loc[stay]=max(scores)
     return out
+
+def aki_diurese(urina, peso, ids, horas=24):
+    """Maior estágio KDIGO pelo critério de diurese, adaptado de mimic-code `kdigo_uo`.
+
+    `urina`: stay_id, offset e disponivel (minutos desde a entrada na UTI) e valor (mL
+    coletados desde o registro anterior). Em cada registro t < corte, a janela
+    (t-W, t] só é avaliada se a monitorização cobre W horas inteiras desde o primeiro
+    registro; o volume do primeiro registro, de intervalo desconhecido, não entra.
+    Estágio 1: <0,5 mL/kg/h por 6h; 2: <0,5 por 12h; 3: <0,3 por 24h ou anúria por 12h.
+    Sem peso válido ou cobertura mínima de 6h, o estágio é desconhecido (não zero).
+    """
+    out=pd.Series(np.nan,index=pd.Index(ids,name='stay_id'),name=f'aki_diurese_estagio_{horas}h')
+    peso=pd.to_numeric(peso,errors='coerce').where(lambda x:x.between(25,350))
+    d=urina[urina.offset.ge(0)&urina.offset.lt(horas*60)&urina.disponivel.lt(horas*60)&urina.stay_id.isin(ids)]
+    d=d[d.valor.notna()].groupby(['stay_id','offset'],as_index=False).valor.sum()
+    for stay,g in d.groupby('stay_id'):
+        w=peso.get(stay,np.nan)
+        if not np.isfinite(w): continue
+        t=g.offset.to_numpy(float)/60; v=g.valor.to_numpy(float); first=t[0]
+        cum=np.concatenate([[0.],np.cumsum(v)])
+        stages=[]
+        for i in range(len(t)):
+            def rate(h):
+                if t[i]-first<h-1e-9: return None
+                j=np.searchsorted(t,t[i]-h,side='right')  # registros em (t-h, t]
+                return (cum[i+1]-cum[j])/w/h
+            r6,r12,r24=rate(6),rate(12),rate(24)
+            if r6 is None: continue
+            s=0
+            if r6<.5: s=1
+            if r12 is not None and r12<.5: s=2
+            if (r24 is not None and r24<.3) or (r12 is not None and r12<=0): s=3
+            stages.append(s)
+        if stages: out.loc[stay]=max(stages)
+    return out
+
+def aki_kdigo(creatinina, diurese):
+    """Maior estágio entre os critérios; desconhecido só se ambos forem desconhecidos."""
+    return pd.concat([creatinina,diurese],axis=1).max(axis=1)
 
 def taxa_mcg_kg_min(rate, unidade, peso):
     rate=pd.to_numeric(rate,errors='coerce')
@@ -123,4 +163,28 @@ def ausculta(registros,ids):
         out.loc[~out.index.isin(measured),name]=np.nan
     out['ausculta_alterada_24h']=out[list(maps)].max(axis=1)
     out['ausculta_registrada_24h']=out.index.isin(measured).astype(int)
+    return out
+
+def arritmia_maligna(texto):
+    """Lista de Yang: FV, flutter ventricular, FA, taquicardia sustentada, BAV total.
+
+    Igual à definição ampla de `arritmias`, mas TV não sustentada não conta.
+    """
+    t=texto.fillna('').str.lower()
+    return arritmias(t)[0]&~t.str.contains(r'non.?sustained|\bnsvt\b',regex=True)
+
+def ausculta_yang(registros,ids):
+    """Categorias da Tabela 1 de Yang: roncos, sopro brônquico/tubular e estridor.
+
+    Estertores, sibilos e murmúrio diminuído não entram (o artigo os agrupa como
+    'clear'). Sem registro = 0, como sugerem as proporções publicadas para o eICU;
+    essa convenção é uma suposição e fica registrada em `ausculta_yang_registrada_24h`.
+    """
+    out=pd.DataFrame(index=pd.Index(ids,name='stay_id'))
+    text=registros.texto.fillna('').str.lower()
+    for name,regex in {'roncos_yang_24h':r'rhonch|ronc','bronquico_yang_24h':r'bronchial|tubular',
+                       'estridor_yang_24h':r'stridor'}.items():
+        negated=text.str.contains(r'(?:no|without|absent)\s+(?:'+regex+r')',regex=True)
+        out[name]=out.index.isin(registros.loc[text.str.contains(regex,regex=True)&~negated,'stay_id']).astype(int)
+    out['ausculta_yang_registrada_24h']=out.index.isin(registros.loc[text.ne(''),'stay_id']).astype(int)
     return out

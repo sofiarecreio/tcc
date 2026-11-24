@@ -3,11 +3,11 @@ import json
 from pathlib import Path
 import numpy as np
 import pandas as pd
-from experimentos_24h import TODAS, ROOT, harmonizar
+from experimentos_24h import TODAS, ROOT, harmonizar, carregar_painel
 
 def auditar():
     ROOT.mkdir(parents=True,exist_ok=True)
-    frames={b:pd.read_csv(f'data/processados/{b}_ampliado_24h.csv') for b in ['mimic','eicu']}
+    frames={b:carregar_painel(b) for b in ['mimic','eicu']}
     rows=[]; hospitais=[]; summary={}
     for base,d in frames.items():
         assert d.stay_id.notna().all() and not d.stay_id.duplicated().any()

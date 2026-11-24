@@ -24,12 +24,18 @@ from avaliar_protocolo_24h import (modelos, avaliar_classificador, avaliar_regre
                                   explicar, comparar_rede_xgboost)
 from variaveis_protocolo import colunas
 
-ROOT=Path('artefatos_protocolo_24h/experimentos_v3')
+# v4 = protocolo adotado (painel ampliado + contexto de 24h). v3 fica preservado para
+# comparação e para os experimentos exploratórios que foram feitos sobre ele.
+ROOT=Path('artefatos_protocolo_24h/experimentos_v4')
+V3=Path('artefatos_protocolo_24h/experimentos_v3')
 NOVAS=['pas_24h','aki_creatinina_estagio_24h','aki_creatinina_24h','sofa_24h',
        'sofa_componentes_observados','arritmia_yang_24h','arritmia_ventricular_24h',
        'roncos_24h','sibilos_24h','estertores_24h','estridor_24h','murmurio_diminuido_24h',
        'ausculta_alterada_24h','ausculta_registrada_24h','valvulopatia_previa','cateterismo_cardiaco_24h']
-TODAS=colunas('completo')+NOVAS
+TODAS_V3=colunas('completo')+NOVAS
+# Contexto conhecido até 24h (contexto_24h.py): tipo de UTI, origem, tempo pré-UTI e tendências.
+CONTEXTO=[f'unidade_{u}' for u in ['coronariana','cardiotoracica','clinica','cirurgica','mista','neuro']]+    [f'origem_{o}' for o in ['pronto_socorro','centro_cirurgico','enfermaria','outra_uti','direta_externa']]+    ['horas_pre_uti']+[f'{n}_{s}_24h' for n in ['creatinina','bun','lactato'] for s in ['ultimo','delta']]
+TODAS=TODAS_V3+CONTEXTO
 IO=[c for c in TODAS if any(s in c for s in ['noradrenalina','vasopress','adrenalina',
     'fenilefrina','dopamina','inotropico','diuretic','furosemida','volume_infundido','diurese',
     'balanco','oliguria','bolus_cristaloide'])]+['sofa_24h','sofa_componentes_observados']
@@ -121,24 +127,25 @@ def otimizar(tr,features,nome,corte,folder,regressao=False):
     joblib.dump(result,folder/'ajuste.joblib')
     return result
 
-def harmonizar(m,e):
+def harmonizar(m,e,todas=None,root=None):
+    todas=TODAS if todas is None else todas; root=ROOT if root is None else root
     # Exclusões motivadas pela fonte; jamais escolhidas pela AUC externa.
     excluded={'feve':'Sem extração temporal equivalente de ecocardiograma no eICU',
               'tipo_admissao':'Categorias de origem/admissão não equivalem às oito categorias MIMIC',
               'furosemida_dose_total_24h':'Snapshots e ordens não comprovam dose acumulada administrada'}
-    for col in TODAS:
+    for col in todas:
         if col not in m or col not in e or m[col].notna().sum()==0 or e[col].notna().sum()==0:
             excluded[col]='Nenhum valor recuperado em pelo menos uma base; não imputar coluna inteira'
     if 'nt_probnp_max_24h' in excluded: excluded['nt_probnp_medido']='Sem NT-proBNP equivalente; BNP não é substituto'
     if 'troponina_t_max_24h' in excluded: excluded['troponina_medida']='Sem troponina T equivalente; não substituir por I'
-    features=[c for c in TODAS if c not in excluded]
+    features=[c for c in todas if c not in excluded]
     rows=[]
-    for col in TODAS:
+    for col in todas:
         rows.append({'variavel':col,'incluida':col in features,'motivo':excluded.get(col,'Definição harmonizada, com limitações documentadas'),
                      'ausente_mimic':float(m[col].isna().mean()) if col in m else 1.,
                      'ausente_eicu':float(e[col].isna().mean()) if col in e else 1.})
-    ROOT.mkdir(parents=True,exist_ok=True)
-    pd.DataFrame(rows).to_csv(ROOT/'harmonizacao.csv',index=False)
+    root.mkdir(parents=True,exist_ok=True)
+    pd.DataFrame(rows).to_csv(root/'harmonizacao.csv',index=False)
     return features
 
 def avaliar(result,d,folder,bootstrap=500,shap=False,regressao=False):
@@ -185,6 +192,7 @@ def _ablacoes(m,bootstrap=500):
     rows=[]
     configs={'completo_ampliado':(TODAS,False,1.,False),
         'sem_novas_variaveis':(colunas('completo'),False,1.,False),
+        'sem_contexto':(TODAS_V3,False,1.,False),
         'sem_entradas_saidas':([c for c in TODAS if c not in IO],False,1.,False),
         'sem_mais_30pct_ausencia':(TODAS,False,.3,False),
         'indicadores_de_ausencia':(TODAS,True,1.,False),
@@ -239,34 +247,66 @@ def diferenca_pareada(a,b,bootstrap=500):
     lo,hi=np.quantile(values,[.025,.975]) if values else (np.nan,np.nan)
     return {'delta_completo_menos_variante':roc_auc_score(y,pa)-roc_auc_score(y,pb),'ic95_inf':lo,'ic95_sup':hi}
 
-def benchmark(bootstrap=500):
+AKI={'creatinina':'aki_creatinina_estagio_24h','kdigo24':'aki_kdigo_estagio_24h','kdigo48':'aki_kdigo_estagio_48h'}
+
+def benchmark(bootstrap=500,ic_max_seq=1,sem_curtas=False,aki='creatinina',revisar=()):
     m=pd.read_csv('data/processados/mimic_ampliado_todas_estadias.csv')
     e=pd.read_csv('data/processados/eicu_ampliado_todas_estadias.csv')
-    def select(d): return d[d.ic_principal.eq(True)&d.primeira_uti_internacao.eq(True)&d.obito_hospitalar.eq(0)].copy()
+    if aki!='creatinina':
+        # Colunas de aki_kdigo.py; kdigo48 consulta dados posteriores a 24h (retrospectivo).
+        m=m.merge(pd.read_csv('data/processados/mimic_aki_kdigo.csv'),on='stay_id',how='left',validate='one_to_one')
+        e=e.merge(pd.read_csv('data/processados/eicu_aki_kdigo.csv'),on='stay_id',how='left',validate='one_to_one')
+    feats=[AKI[aki] if f=='aki_creatinina_estagio_24h' else f for f in YANG]
+    if revisar:
+        # Colunas de preditores_yang.py: definições da Tabela 1 de Yang, em 24h.
+        m=m.merge(pd.read_csv('data/processados/mimic_preditores_yang.csv'),on='stay_id',how='left',validate='one_to_one')
+        e=e.merge(pd.read_csv('data/processados/eicu_preditores_yang.csv'),on='stay_id',how='left',validate='one_to_one')
+        troca={'arritmia':{'arritmia_yang_retro':['arritmia_maligna_24h']},
+               'ausculta':{'ausculta_alterada_24h':['roncos_yang_24h','bronquico_yang_24h','estridor_yang_24h']},
+               'valvulopatia':{'valvulopatia_retro':['valvulopatia_yang']}}
+        mapa={k:v for r in revisar for k,v in troca[r].items()}
+        feats=[g for f in feats for g in mapa.get(f,[f])]
+    if ic_max_seq>1:
+        # Import tardio: experimento_populacao importa este módulo.
+        from experimento_populacao import ic_ate_posicao
+        m=ic_ate_posicao(m,ic_max_seq)
+    def select(d):
+        keep=d.ic_principal.eq(True)&d.primeira_uti_internacao.eq(True)&d.obito_hospitalar.eq(0)
+        if sem_curtas: keep&=d.los_dias.gt(1)
+        return d[keep].copy()
     m,e=select(m),select(e)
     tr,te=dividir_preservando(m)
-    folder=ROOT/'yang_aproximado';folder.mkdir(parents=True,exist_ok=True)
-    (folder/'limites.json').write_text(json.dumps({'populacao':'IC principal, primeira UTI da internação, sobreviventes hospitalares, inclui estadias <=24h',
-        'preditores':YANG,'n_mimic':len(m),'n_eicu':len(e),
+    nome='yang_aproximado'+(f'_ic_seq1a{ic_max_seq}' if ic_max_seq>1 else '')+('_sem_curtas' if sem_curtas else '')+('' if aki=='creatinina' else '_aki_'+aki)+''.join('_'+r for r in sorted(revisar))
+    # Variantes exploratórias do benchmark ficam junto das demais análises do v3.
+    folder=(ROOT if nome=='yang_aproximado' else V3)/nome;folder.mkdir(parents=True,exist_ok=True)
+    pop=('IC principal' if ic_max_seq==1 else f'IC (428/I50) nas posições 1-{ic_max_seq} no MIMIC; Primary no eICU')
+    pop+=', primeira UTI da internação, sobreviventes hospitalares, '+('exclui estadias <=24h' if sem_curtas else 'inclui estadias <=24h')
+    (folder/'limites.json').write_text(json.dumps({'populacao':pop,'n_treino_mimic':len(tr),'n_teste_mimic':len(te),
+        'preditores':feats,'n_mimic':len(m),'n_eicu':len(e),
         'limites':['Aproximação de 10 preditores importantes; não reprodução exata dos 41 candidatos ou nove algoritmos',
-        'MIMIC 3.1, não 2.2','AKI somente critério de creatinina; SOFA adaptado, com cobertura explícita',
+        'MIMIC 3.1, não 2.2',('AKI somente critério de creatinina' if aki=='creatinina' else f'AKI KDIGO creatinina+diurese ({AKI[aki]})')+'; SOFA adaptado, com cobertura explícita',
         'Diagnósticos retrospectivos podem não estar disponíveis em 24h; não utilizar como modelo prospectivo',
         'Diurético e cateterismo até 48h; evidência registrada varia entre as bases',
         'Split por paciente preservado; não selecionar sobreviventes na população principal']},indent=2,ensure_ascii=False),encoding='utf-8')
-    for f in YANG:
-        if tr[f].notna().sum()==0 or e[f].notna().sum()==0: raise ValueError('Benchmark sem variável: '+f)
+    for f in feats:
+        if tr[f].notna().sum()==0 or e[f].notna().sum()==0 or tr[f].nunique()<2: raise ValueError('Benchmark sem variável: '+f)
     rows=[]
     for nome in ['xgboost','rede_neural']:
-        fit=otimizar(tr,YANG,nome,3.55,folder/'buscas'/nome)
+        fit=otimizar(tr,feats,nome,3.55,folder/'buscas'/nome)
         for base,d in [('mimic',te),('eicu',e)]:
             r=avaliar(fit,d,folder/base/nome,bootstrap,shap=nome=='xgboost' and base=='mimic')
             rows.append(dict(modelo=nome,base=base,**r))
     pd.DataFrame(rows).to_csv(folder/'comparacao.csv',index=False)
 
-def rodar(etapa='tudo',bootstrap=500):
+def carregar_painel(base,janela='24h'):
+    """Painel de 24h (ou todas as estadias) com as colunas de contexto juntadas por stay_id."""
+    d=pd.read_csv(f'data/processados/{base}_ampliado_{"24h" if janela=="24h" else "todas_estadias"}.csv',low_memory=False)
+    ctx=pd.read_csv(f'data/processados/{base}_contexto_24h.csv')
+    return d.merge(ctx,on='stay_id',how='left',validate='one_to_one')
+
+def rodar(etapa='tudo',bootstrap=500,ic_max_seq=1,sem_curtas=False,aki='creatinina',revisar=()):
     ROOT.mkdir(parents=True,exist_ok=True)
-    m=pd.read_csv('data/processados/mimic_ampliado_24h.csv')
-    e=pd.read_csv('data/processados/eicu_ampliado_24h.csv')
+    m,e=carregar_painel('mimic'),carregar_painel('eicu')
     missing=[c for c in TODAS if c not in m]
     if missing: raise ValueError('Preditores ausentes: '+str(missing))
     common=harmonizar(m,e)
@@ -281,11 +321,14 @@ def rodar(etapa='tudo',bootstrap=500):
         if etapa in ['tudo','principal']: principais(m,None,TODAS,'completo_ampliado',bootstrap)
         if etapa in ['tudo','externo']: principais(m,e,common,'harmonizado',bootstrap)
         if etapa in ['tudo','ablacoes']: ablacoes(m,bootstrap)
-        if etapa in ['tudo','yang']: benchmark(bootstrap)
+        if etapa in ['tudo','yang']: benchmark(bootstrap,ic_max_seq,sem_curtas,aki,revisar)
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--etapa',default='tudo',choices=['tudo','principal','externo','ablacoes','yang']);p.add_argument('--bootstrap',type=int,default=500)
+    p.add_argument('--ic-max-seq',type=int,default=1);p.add_argument('--sem-curtas',action='store_true')
+    p.add_argument('--aki',default='creatinina',choices=['creatinina','kdigo24','kdigo48'])
+    p.add_argument('--revisar',nargs='*',default=[],choices=['arritmia','ausculta','valvulopatia'])
     a=p.parse_args()
     # Nome importável no pickle: o notebook deve abrir os mesmos modelos depois.
     from experimentos_24h import rodar as executar
-    executar(a.etapa,a.bootstrap)
+    executar(a.etapa,a.bootstrap,a.ic_max_seq,a.sem_curtas,a.aki,tuple(a.revisar))

@@ -5,6 +5,10 @@ solicitados foram desdobrados em medidas e indicadores: pressão sistólica, AKI
 creatinina, SOFA adaptado, arritmia, ausculta pulmonar, valvulopatia prévia e
 registro de cateterismo cardíaco. `experimentos_24h.TODAS` é a lista executável.
 
+**Protocolo adotado (v4):** às 70 variáveis (v3) somam-se 18 de contexto conhecidas
+até 24h, totalizando 88 no MIMIC e 83 no painel harmonizado. Resultados em
+`artefatos_protocolo_24h/experimentos_v4/`; o v3 é preservado para comparação.
+
 ## População e tempo
 
 O painel principal contém adultos com IC identificada retrospectivamente e LOS
@@ -30,6 +34,24 @@ recalibração usando desfechos do eICU.
 | Breath sounds | Ausculta, itens 223986–223989 | Caminhos de ausculta em `physicalExam` | Roncos, sibilos, estertores, estridor, murmúrio diminuído, qualquer alteração e presença de exame. Negação explícita não vira achado positivo |
 | Valvulopatia prévia | Diagnóstico em internação hospitalar encerrada antes da UTI atual | Histórico registrado até 24h em `pastHistory` | Ausência de evidência não prova ausência da doença. História hospitalar e história relatada têm coberturas diferentes |
 | Cateterismo cardíaco | `procedureevents`, item 225430 | `treatment`: cateterismo/angiografia cardíaca | Registro até 24h; remove procedimentos reescritos no MIMIC e menções de planejamento no eICU. A tabela de tratamento não é confirmação independente da realização |
+
+## Contexto de 24h (adotado no v4)
+
+Gerado por `contexto_24h.py` em `data/processados/{base}_contexto_24h.csv` e
+juntado ao painel por `experimentos_24h.carregar_painel`.
+
+| Grupo | MIMIC-IV | eICU | Definição e limites |
+|---|---|---|---|
+| Tipo de UTI | `icustays.first_careunit` | `patient.unittype` | Seis indicadores: coronariana (CCU, Cardiac ICU, CCU-CTICU), cardiotorácica (CVICU, CTICU, CSICU), clínica, cirúrgica (SICU, TSICU), mista (MICU/SICU, Med-Surg ICU) e neuro. CCU-CTICU é unidade combinada e foi agrupada como coronariana |
+| Origem antes da UTI | Última unidade em `transfers` antes da entrada | `patient.unitadmitsource` | Pronto-socorro, centro cirúrgico/recuperação, enfermaria/step-down, outra UTI e direta/externa. Sem transferência prévia no MIMIC = direta/externa |
+| Tempo pré-UTI | Entrada na UTI − `admittime` | −`hospitaladmitoffset` | Horas, mínimo zero |
+| Tendências | Laboratório até 24h | Laboratório até 24h | Último valor e variação (último − primeiro) de creatinina, ureia (BUN) e lactato; variação só com duas medidas ou mais |
+
+Antes de adotar, `experimento_contexto.py` comparou as variantes sobre o v3 com
+hiperparâmetros fixos e diferenças pareadas (`experimentos_v3/contexto/`). O tipo de UTI
+respondeu pela maior parte do ganho; uma nova busca escolheu os mesmos hiperparâmetros.
+No eICU, o APACHE IVa (permanência prevista) teve AUC semelhante ao modelo v3 e serve
+apenas como referência, pois foi desenvolvido em UTIs semelhantes às do eICU.
 
 O AKI **não implementa KDIGO completo**: não incorpora terapia renal substitutiva
 nem janelas móveis de diurese. Creatinina elevada sem subida documentada não é
@@ -93,7 +115,7 @@ não está comprovada. O painel harmonizado não utiliza FEVE.
    máximos/mínimos seguem os nomes das demais variáveis.
 4. **Ablações XGBoost:** completo; sem as 16 novas; sem entradas/saídas e SOFA que
    delas depende; excluir >30% de ausência no treino; indicadores de ausência;
-   máximos dos exames básicos no lugar de médias. Usa os hiperparâmetros do completo
+   máximos dos exames básicos no lugar de médias; sem o contexto de 24h (= v3). Usa os hiperparâmetros do completo
    para isolar a mudança de variáveis. Comparações e IC pareados por paciente são
    exploratórios; a escolha de variante usa somente CV do treino.
 5. **Yang aproximado separado:** IC principal, primeira UTI da internação,
@@ -107,6 +129,14 @@ eICU, diferentes das 5.744/4.056 publicadas. A prioridade hospitalar de faturame
 e a prioridade diagnóstica da UTI não são necessariamente equivalentes; a definição
 operacional do artigo não foi reproduzida por completo. Não se ajustou o filtro
 para obter artificialmente o tamanho amostral ou a AUC publicados.
+
+Análises de reprodução posteriores (exploratórias, em `experimentos_v3/`): IC nas
+posições 1–2 do CID aproxima o tamanho, a prevalência (25%) e a LOS do artigo
+(`--ic-max-seq 2`); AKI KDIGO com diurese em 48h (`aki_kdigo.py`) reproduz a
+distribuição de estágios; arritmia, ausculta e valvulopatia no formato da Tabela 1
+(`preditores_yang.py`) aproximam as prevalências. Mesmo assim o benchmark ficou em
+AUC ≈0,72 interna e ≈0,68 externa. Variáveis em 48h usam dados posteriores ao
+instante de previsão e não entram no protocolo de 24h.
 
 A MLP compara redes de uma ou duas camadas, regularização e taxa de aprendizado;
 máximo de 200 épocas, sem divisão interna por linhas para early stopping.
