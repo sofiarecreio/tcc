@@ -200,8 +200,8 @@ def drogas_eicu(ids,peso,audit):
         (pd.to_numeric(raw.drugrate,errors='coerce').gt(0)|pd.to_numeric(raw.infusionrate,errors='coerce').gt(0)),'stay_id'])
     return out
 
-def fluidos_eicu(ids,peso,audit):
-    b=janela(carregar('eicu','intakeOutput'))
+def fluidos_eicu(ids,peso,audit,horas=24):
+    b=janela(carregar('eicu','intakeOutput'),horas)
     # Somente eventos individuais; nunca somar intaketotal/outputtotal/nettotal cumulativos.
     b=b.drop_duplicates('intakeoutputid').sort_values('disponivel').drop_duplicates(['stay_id','offset','cellpath','celllabel'],keep='last').copy()
     path=b.cellpath.fillna('').str.lower(); label=b.celllabel.fillna('').str.lower()
@@ -219,7 +219,7 @@ def fluidos_eicu(ids,peso,audit):
     for name,regex in DRUGS.items():
         flag(out,name+'_io',b.loc[inp&label.str.contains(regex,regex=True)&b.valor.gt(0),'stay_id'])
     out['diurese_medida']=out.diurese_total_24h.notna().astype(int)
-    out['diurese_ml_kg_h_24h']=out.diurese_total_24h/(peso*24)
+    out['diurese_ml_kg_h_24h']=out.diurese_total_24h/(peso*horas)
     out['oliguria_24h']=out.diurese_ml_kg_h_24h.lt(.5).astype(float).where(out.diurese_ml_kg_h_24h.notna())
     out['balanco_hidrico_24h']=out.volume_infundido_24h-out.saida_total_24h
     out['balanco_ml_kg_24h']=out.balanco_hidrico_24h/peso
@@ -315,6 +315,11 @@ def eicu(c,audit):
     out['vasopressor_24h']=out.n_vasopressores_24h.gt(0).astype(int)
     out['inotropico_24h']=out[['dobutamina_24h','milrinona_24h']].max(axis=1)
     out['diuretico_alca_24h']=out[['furosemida_24h','bumetanida_24h','torsemida_24h']].max(axis=1)
+    io48=fluidos_eicu(ids,out.peso_kg,{},horas=48)
+    out['diuretico_alca_48h']=pd.concat([out.diuretico_alca_48h,
+        io48[['furosemida_io','bumetanida_io','torsemida_io']].max(axis=1)],axis=1).max(axis=1)
+    if (out.diuretico_alca_24h > out.diuretico_alca_48h).any():
+        raise ValueError('Diuretico presente em 24h e ausente em 48h')
     out['feve']=np.nan;out['tipo_admissao']=np.nan
     return out
 

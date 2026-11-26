@@ -59,6 +59,32 @@ A FEVE usa medidas estruturadas de Echo. ECG não é entrada do fluxo atual.
 
 ## Executar o fluxo ampliado
 
+### Busca exploratória ampliada (v5)
+
+`python busca_ampliada.py` preserva a v4 e grava em
+`artefatos_protocolo_24h/experimentos_v5/`. Para cada perfil e corte, compara
+50 configurações de XGBoost, 15 de Random Forest e 12 de MLP, com cinco folds
+agrupados por paciente. A inclusão de indicadores de ausência participa da busca.
+A família vencedora é escolhida exclusivamente pela AUC da CV do treino MIMIC;
+somente depois são avaliados o teste interno e, no perfil harmonizado, o eICU.
+O limiar usa previsões fora da amostra do treino após seleção. Essas avaliações
+continuam exploratórias, pois os conjuntos de teste já foram consultados.
+As buscas concluídas são reutilizadas quando dados e configuração coincidem.
+
+O benchmark de Yang agora combina infusões e entradas registradas também em 48h
+para identificar diuréticos no eICU. Seus novos resultados recebem o sufixo
+`_tratamentos_corrigidos`, preservando os anteriores. Não se usa prescrição como
+prova de administração. A correção não altera os preditores de 24h da v4.
+
+`python auditar_tratamentos.py` salva a auditoria agregada em
+`artefatos_protocolo_24h/auditoria_tratamentos/eicu.json`. Na revisão de 25/11,
+foram recuperados 132 registros positivos e eliminadas 105 contradições entre
+24h e 48h. No benchmark com IC nas posições 1–2, KDIGO 48h e as três revisões
+clínicas, a AUC externa XGBoost passou de 0,6759 para 0,6775; a interna permaneceu
+0,7222. Isso não demonstra um ganho clinicamente relevante. Há 6.088 estadias
+com ordem de diurético, contra 725 com evidência recuperada de administração,
+em 16.851 estadias: cobertura de prescrição e administração não são equivalentes.
+
 Os dados já extraídos podem ser reutilizados. Para reproduzir tudo, no terminal da pasta TCC:
 
 ```powershell

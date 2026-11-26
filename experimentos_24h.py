@@ -252,6 +252,14 @@ AKI={'creatinina':'aki_creatinina_estagio_24h','kdigo24':'aki_kdigo_estagio_24h'
 def benchmark(bootstrap=500,ic_max_seq=1,sem_curtas=False,aki='creatinina',revisar=()):
     m=pd.read_csv('data/processados/mimic_ampliado_todas_estadias.csv')
     e=pd.read_csv('data/processados/eicu_ampliado_todas_estadias.csv')
+    # Recalcula a evidencia de IO em 48h mesmo ao reutilizar paineis antigos.
+    from painel_ampliado import fluidos_eicu
+    indexed=e.set_index('stay_id')
+    io48=fluidos_eicu(indexed.index,indexed.peso_kg,{},horas=48)
+    positivos=io48[['furosemida_io','bumetanida_io','torsemida_io']].max(axis=1)
+    e['diuretico_alca_48h']=np.maximum(e.diuretico_alca_48h,e.stay_id.map(positivos))
+    if (e.diuretico_alca_24h>e.diuretico_alca_48h).any():
+        raise ValueError('Diuretico 24h ausente em 48h')
     if aki!='creatinina':
         # Colunas de aki_kdigo.py; kdigo48 consulta dados posteriores a 24h (retrospectivo).
         m=m.merge(pd.read_csv('data/processados/mimic_aki_kdigo.csv'),on='stay_id',how='left',validate='one_to_one')
@@ -278,7 +286,7 @@ def benchmark(bootstrap=500,ic_max_seq=1,sem_curtas=False,aki='creatinina',revis
     tr,te=dividir_preservando(m)
     nome='yang_aproximado'+(f'_ic_seq1a{ic_max_seq}' if ic_max_seq>1 else '')+('_sem_curtas' if sem_curtas else '')+('' if aki=='creatinina' else '_aki_'+aki)+''.join('_'+r for r in sorted(revisar))
     # Variantes exploratórias do benchmark ficam junto das demais análises do v3.
-    folder=(ROOT if nome=='yang_aproximado' else V3)/nome;folder.mkdir(parents=True,exist_ok=True)
+    folder=(ROOT if nome=='yang_aproximado' else V3)/(nome+'_tratamentos_corrigidos');folder.mkdir(parents=True,exist_ok=True)
     pop=('IC principal' if ic_max_seq==1 else f'IC (428/I50) nas posições 1-{ic_max_seq} no MIMIC; Primary no eICU')
     pop+=', primeira UTI da internação, sobreviventes hospitalares, '+('exclui estadias <=24h' if sem_curtas else 'inclui estadias <=24h')
     (folder/'limites.json').write_text(json.dumps({'populacao':pop,'n_treino_mimic':len(tr),'n_teste_mimic':len(te),
