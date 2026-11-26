@@ -1,0 +1,16 @@
+# Figuras do modelo v5
+
+PNG: 300 dpi. PDF: formato vetorial para diagramacao. Resultados exploratorios.
+
+- 01_roc: discriminacao no teste MIMIC e validacao externa eICU.
+- 02_calibracao: probabilidades previstas versus frequencias observadas.
+- 03_dca: beneficio liquido estimado; nao demonstra beneficio clinico prospectivo. Eixo de limiar limitado a 0-0,8 e beneficio a -0,1-0,5 para legibilidade.
+- 04_auc_ic95: AUC e IC95% por bootstrap agrupado por paciente, dos resultados salvos.
+- 05_shap_completo/harmonizado: 15 variaveis de maior SHAP absoluto medio; 500 estadias de teste MIMIC, amostradas com semente 42. Saida bruta do XGBoost. Nao indica causalidade ou direcao do efeito.
+- 06_comparacao_cv: melhores configuracoes por familia na CV do treino; nao confundir com desempenho independente no teste.
+
+Completo: 88 variaveis; harmonizado: 83. Sao modelos distintos treinados no MIMIC. Para avaliar transporte entre bases, compare harmonizado MIMIC e harmonizado eICU.
+O XGBoost foi escolhido pela CV em todos os cenarios. Testes interno e externo foram consultados no desenvolvimento: resultados exploratorios.
+As figuras foram geradas exclusivamente da v5, sem misturar v3/v4. Nao incluem regressao nem ablacoes, que nao foram refeitas na v5.
+Fonte local: artefatos_protocolo_24h/experimentos_v5. Reproducao: python gerar_figuras_v5.py (requer os dados e modelos locais autorizados).
+O pacote contem somente figuras agregadas e este texto. Nao contem identificadores, tabelas individuais, modelos serializados ou bases clinicas.
